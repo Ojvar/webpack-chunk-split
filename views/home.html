@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Hello WebPack</h1>
+        <div id="app">
+            <div>
+                <ul>
+                    <li>
+                        <router-link to="/">Home</router-link>
+                    </li>
+                    <li>
+                        <router-link to="/about">About</router-link>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <router-view></router-view>
+            </div>
+        </div>
+        <script src="../dist/chunks/vue.js"></script>
+        <script src="../dist/home.js"></script>
+    </body>
+</html>
