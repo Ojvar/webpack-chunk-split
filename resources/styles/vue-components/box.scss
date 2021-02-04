@@ -1,0 +1,7 @@
+$ROUND-BORDER-SIZE: 5px;
+$ROUND-BORDER-COLOR: gray;
+
+.round-box {
+    border: 1px solid $ROUND-BORDER-COLOR;
+    border-radius: $ROUND-BORDER-SIZE;
+}

@@ -1,5 +1,5 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+import  "./helpers/styles";
+import { Vue, VueRouter } from "./helpers/global-modules";
 
 /**
  * HomePage class

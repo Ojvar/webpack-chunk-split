@@ -1,4 +1,4 @@
 <template lang="pug">
-div
+.round-box
     h1 Main
 </template>

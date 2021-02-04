@@ -9,13 +9,15 @@ module.exports = {
     mode: webpackMode,
 
     entry: {
-        home: "./resources/scripts/home.ts",
-        about: "./resources/scripts/about.ts",
+        scripts__home_dot_js: "./resources/scripts/home.ts",
+        scripts__about_dot_js: "./resources/scripts/about.ts",
+        // styles__vue_styles_dot_css: "./resources/styles/vue-styles.scss",
     },
 
     output: {
         path: Path.resolve(__dirname, "../dist"),
-        filename: "[name].js",
+        filename: (chunk) =>
+            chunk.chunk.name.replace(/__/i, "/").replace(/\_dot\_/i, "."),
     },
 
     plugins: [new VueLoaderPlugin()],
@@ -166,7 +168,7 @@ module.exports = {
                 vue: {
                     chunks: "all",
                     test: /[\\/]node_modules[\\/]vue.*/,
-                    name: `chunks/vue`,
+                    name: `chunks/vue.js`,
                 },
 
                 commons: {
@@ -178,12 +180,13 @@ module.exports = {
                             chunks,
                             cacheGroupKey
                         );
-                        const chunkFileName = chunkData.moduleFileName.replace(
-                            /\.js/i,
-                            ""
-                        );
+                        const chunkFileName = chunkData.moduleFileName;
+                        // const chunkFileName = chunkData.moduleFileName.replace(
+                        //     /\.js/i,
+                        //     ""
+                        // );
 
-                        return `chunks/${chunkFileName}`;
+                        return `chunks/${chunkFileName}.js`;
                         // return `${chunkData.cacheGroupKey}-${chunkData.allChunksNames}-${chunkData.moduleFileName}`;
                     },
                 },
@@ -211,4 +214,31 @@ function extractChunkData(module, chunks, cacheGroupKey) {
         allChunksNames,
         cacheGroupKey,
     };
+}
+
+/**
+ * Suppress plugin
+ */
+function suppressPlugin(sender) {
+    console.log(sender);
+
+    const SuppressChunksPlugin = require("suppress-chunks-webpack-plugin")
+        .default;
+
+    // const styles = entries.styles || {};
+    const styles = {};
+    const options = Object.keys(styles).map(
+        (key) => (
+            {
+                name: key,
+                match: /\.js\.map$/,
+            },
+            {
+                name: key,
+                match: /\.js$/,
+            }
+        )
+    );
+
+    return new SuppressChunksPlugin(options);
 }

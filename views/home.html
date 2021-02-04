@@ -4,6 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
+
+        <link rel="stylesheet" href="../dist/styles/box.css" />
     </head>
     <body>
         <h1>Hello WebPack</h1>
@@ -33,7 +35,7 @@
                 <router-view></router-view>
             </div>
         </div>
-        <script src="../dist/chunks/vue.js"></script>
-        <script src="../dist/home.js"></script>
+        <script defer src="../dist/chunks/vue.js"></script>
+        <script defer src="../dist/scripts/home.js"></script>
     </body>
 </html>
