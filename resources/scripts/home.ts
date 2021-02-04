@@ -24,15 +24,19 @@ export class HomePage {
                 routes: [
                     {
                         path: "/",
-                        component: {
-                            template: `<div>Home C</div>`,
-                        },
+                        component: () =>
+                            import(
+                                /* webpackChunkName: "components/home" */
+                                "../scripts/components/home.vue"
+                            ),
                     },
                     {
                         path: "/about",
-                        component: {
-                            template: `<div>About C</div>`,
-                        },
+                        component: () =>
+                            import(
+                                /* webpackChunkName: "components/about" */
+                                "../scripts/components/about.vue"
+                            ),
                     },
                 ],
             });

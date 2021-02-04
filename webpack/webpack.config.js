@@ -1,7 +1,12 @@
 const Path = require("path");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+const webpackMode = process.env.NODE_ENV || "production";
+const isDev = webpackMode == "development";
 
 module.exports = {
-    mode: "development",
+    mode: webpackMode,
 
     entry: {
         home: "./resources/scripts/home.ts",
@@ -13,8 +18,119 @@ module.exports = {
         filename: "[name].js",
     },
 
+    plugins: [new VueLoaderPlugin()],
+
     module: {
         rules: [
+            {
+                test: /\.styl(us)?$/,
+                oneOf: [
+                    {
+                        resourceQuery: /vue/,
+                        use: [
+                            "style-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "stylus-loader",
+                        ],
+                    },
+                    {
+                        resourceQuery: /(?!vue)/,
+                        use: [
+                            MiniCssExtractPlugin.loader,
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "less-loader",
+                        ],
+                    },
+                ],
+            },
+            {
+                test: /\.less$/,
+                oneOf: [
+                    {
+                        resourceQuery: /vue/,
+                        use: [
+                            "style-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "less-loader",
+                        ],
+                    },
+                    {
+                        resourceQuery: /(?!vue)/,
+                        use: [
+                            MiniCssExtractPlugin.loader,
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "less-loader",
+                        ],
+                    },
+                ],
+            },
+            {
+                test: /\.(scss|sass|css)$/,
+                oneOf: [
+                    {
+                        resourceQuery: /vue/,
+                        use: [
+                            "style-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "sass-loader",
+                        ],
+                    },
+                    {
+                        resourceQuery: /(?!vue)/,
+                        use: [
+                            MiniCssExtractPlugin.loader,
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    sourceMap: isDev,
+                                },
+                            },
+                            "sass-loader",
+                        ],
+                    },
+                ],
+            },
+            {
+                test: /\.pug$/,
+                oneOf: [
+                    {
+                        resourceQuery: /^\?vue/,
+                        use: ["pug-plain-loader"],
+                    },
+                    {
+                        use: ["raw-loader", "pug-plain-loader"],
+                    },
+                ],
+            },
+            {
+                test: /\.vue$/,
+                loader: "vue-loader",
+            },
             {
                 test: /\.tsx?$/,
                 use: "ts-loader",
