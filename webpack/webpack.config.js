@@ -1,5 +1,4 @@
 const Path = require("path");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const webpackMode = process.env.NODE_ENV || "production";
@@ -11,7 +10,7 @@ module.exports = {
     entry: {
         scripts__home_dot_js: "./resources/scripts/home.ts",
         scripts__about_dot_js: "./resources/scripts/about.ts",
-        // styles__vue_styles_dot_css: "./resources/styles/vue-styles.scss",
+        styles__vue_styles_dot_css: "./resources/styles/vue-styles.scss",
     },
 
     output: {
@@ -20,7 +19,7 @@ module.exports = {
             chunk.chunk.name.replace(/__/i, "/").replace(/\_dot\_/i, "."),
     },
 
-    plugins: [new VueLoaderPlugin()],
+    plugins: [vueLoaderPlugin(), miniCssExtract()],
 
     module: {
         rules: [
@@ -181,13 +180,8 @@ module.exports = {
                             cacheGroupKey
                         );
                         const chunkFileName = chunkData.moduleFileName;
-                        // const chunkFileName = chunkData.moduleFileName.replace(
-                        //     /\.js/i,
-                        //     ""
-                        // );
 
                         return `chunks/${chunkFileName}.js`;
-                        // return `${chunkData.cacheGroupKey}-${chunkData.allChunksNames}-${chunkData.moduleFileName}`;
                     },
                 },
             },
@@ -241,4 +235,20 @@ function suppressPlugin(sender) {
     );
 
     return new SuppressChunksPlugin(options);
+}
+
+/**
+ * VueLoader plugin
+ */
+function vueLoaderPlugin(env, entries) {
+    const VueLoaderPlugin = require("vue-loader/lib/plugin");
+
+    return new VueLoaderPlugin();
+}
+
+/**
+ * MiniCssExtract plugin
+ */
+function miniCssExtract(env, entries) {
+    return new MiniCssExtractPlugin();
 }

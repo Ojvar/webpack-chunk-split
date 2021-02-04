@@ -1,4 +1,3 @@
-import  "./helpers/styles";
 import { Vue, VueRouter } from "./helpers/global-modules";
 
 /**
