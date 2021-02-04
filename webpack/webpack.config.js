@@ -2,7 +2,7 @@ const Path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const webpackMode = process.env.NODE_ENV || "production";
-const isDev = webpackMode == "development";
+const devMode = webpackMode == "development";
 
 module.exports = {
     mode: webpackMode,
@@ -15,76 +15,20 @@ module.exports = {
 
     output: {
         path: Path.resolve(__dirname, "../dist"),
-        filename: (chunk) =>
-            chunk.chunk.name.replace(/__/i, "/").replace(/\_dot\_/i, "."),
+        filename: (chunk) => {
+            const name = chunk.chunk.name;
+            if (name.startsWith("styles__")) {
+                return name + ".js";
+            } else {
+                return convertName(chunk.chunk.name);
+            }
+        },
     },
 
-    plugins: [vueLoaderPlugin(), miniCssExtract()],
+    plugins: [new VueLoaderPlugin(), miniCssExtractPlugin(), suppressPlugin()],
 
     module: {
         rules: [
-            {
-                test: /\.styl(us)?$/,
-                oneOf: [
-                    {
-                        resourceQuery: /vue/,
-                        use: [
-                            "style-loader",
-                            {
-                                loader: "css-loader",
-                                options: {
-                                    sourceMap: isDev,
-                                },
-                            },
-                            "stylus-loader",
-                        ],
-                    },
-                    {
-                        resourceQuery: /(?!vue)/,
-                        use: [
-                            MiniCssExtractPlugin.loader,
-                            {
-                                loader: "css-loader",
-                                options: {
-                                    sourceMap: isDev,
-                                },
-                            },
-                            "less-loader",
-                        ],
-                    },
-                ],
-            },
-            {
-                test: /\.less$/,
-                oneOf: [
-                    {
-                        resourceQuery: /vue/,
-                        use: [
-                            "style-loader",
-                            {
-                                loader: "css-loader",
-                                options: {
-                                    sourceMap: isDev,
-                                },
-                            },
-                            "less-loader",
-                        ],
-                    },
-                    {
-                        resourceQuery: /(?!vue)/,
-                        use: [
-                            MiniCssExtractPlugin.loader,
-                            {
-                                loader: "css-loader",
-                                options: {
-                                    sourceMap: isDev,
-                                },
-                            },
-                            "less-loader",
-                        ],
-                    },
-                ],
-            },
             {
                 test: /\.(scss|sass|css)$/,
                 oneOf: [
@@ -95,7 +39,7 @@ module.exports = {
                             {
                                 loader: "css-loader",
                                 options: {
-                                    sourceMap: isDev,
+                                    sourceMap: devMode,
                                 },
                             },
                             "sass-loader",
@@ -108,7 +52,7 @@ module.exports = {
                             {
                                 loader: "css-loader",
                                 options: {
-                                    sourceMap: isDev,
+                                    sourceMap: devMode,
                                 },
                             },
                             "sass-loader",
@@ -213,28 +157,32 @@ function extractChunkData(module, chunks, cacheGroupKey) {
 /**
  * Suppress plugin
  */
-function suppressPlugin(sender) {
-    console.log(sender);
-
+function suppressPlugin() {
     const SuppressChunksPlugin = require("suppress-chunks-webpack-plugin")
         .default;
+    const options = ["styles__vue_styles_dot_css"];
 
-    // const styles = entries.styles || {};
-    const styles = {};
-    const options = Object.keys(styles).map(
-        (key) => (
-            {
-                name: key,
-                match: /\.js\.map$/,
-            },
-            {
-                name: key,
-                match: /\.js$/,
-            }
-        )
-    );
+    return new SuppressChunksPlugin(options, { filter: /\.js$/ });
+}
 
-    return new SuppressChunksPlugin(options);
+/**
+ * Mini Css plugin
+ */
+function miniCssExtractPlugin() {
+    // return new MiniCssExtractPlugin();
+    return new MiniCssExtractPlugin({
+        filename: (chunk) => convertName(chunk.chunk.name),
+        // filename: devMode ? "[name].css" : "[name].[contenthash].css",
+        chunkFilename: devMode ? "[id].css" : "[id].[contenthash].css",
+    });
+}
+
+/**
+ * Convert name
+ * @param {*} name
+ */
+function convertName(name) {
+    return name.replace(/__/i, "/").replace(/\_dot\_/i, ".");
 }
 
 /**
